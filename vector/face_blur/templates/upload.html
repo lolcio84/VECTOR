@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Image{% endblock %}
+
+{% block content %}
+<body>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="file" name="myfile">
+        <button type="submit">Wyślij zdjęcie</button>
+    </form>
+
+    {% if photo %}
+        <p>Wgrano plik!</p>
+        <img src="{{ photo.image.url }}" alt="Twoje zdjęcie" style="max-width: 500px;">
+    {% endif %}
+
+    <a href="{% url 'show_photos' %}">
+        <button>Zobacz galerie</button>
+    </a>
+</body>
+{% endblock %}

@@ -1,0 +1,16 @@
+<body>
+    <h1>{{ count }}</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">kliknij</button>
+    </form>
+
+    {% if count > 10 %}
+    <h1>Sukces</h1>
+    {% endif %}
+
+    <a href="{% url 'hello_page' %}">
+    <button type="button">Przejdź do Hello</button>
+    </a>
+</body>
