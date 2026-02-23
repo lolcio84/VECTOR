@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block title %}Face Blur Tool - VECTOR{% endblock %}
+
+{% block content %}
+    <h2>Face Blur Tool</h2>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <label>Wybierz zdjęcie:</label>
+        <input type="file" name="image" required>
+        <button type="submit">Prześlij i wykryj twarze</button>
+    </form>
+
+    <hr>
+
+    {% if image_base64 %}
+    <div>
+        <strong>Ustawienia (Plik został usunięty z serwera):</strong><br><br>
+        
+        <label>Rozmiar obszaru:</label><br>
+        <input type="range" id="sizeSlider" min="0.5" max="3.0" step="0.1" value="1.2">
+        <span id="sizeVal">1.2x</span>
+        <br><br>
+
+        <label>Siła rozmycia:</label><br>
+        <input type="range" id="strengthSlider" min="0" max="50" step="1" value="20">
+        <span id="strengthVal">20px</span>
+        <br><br>
+
+        <a id="downloadLink" download="blurred_image.png">
+            <button type="button">Pobierz gotowe zdjęcie</button>
+        </a>
+    </div>
+
+    <br>
+    <canvas id="canvas" style="border: 1px solid black; max-width: 100%;"></canvas>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const sizeSlider = document.getElementById('sizeSlider');
+        const sizeVal = document.getElementById('sizeVal');
+        const strengthSlider = document.getElementById('strengthSlider');
+        const strengthVal = document.getElementById('strengthVal');
+        const downloadLink = document.getElementById('downloadLink');
+
+        // Pobieramy dane Base64 przekazane z Django
+        const faces = {{ faces_json|safe }};
+        const img = new Image();
+        
+        // Ładujemy obrazek z ciągu znaków Base64
+        img.src = "{{ image_base64|safe }}";
+
+        img.onload = () => {
+            canvas.width = img.width;
+            canvas.height = img.height;
+            draw();
+        };
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.filter = "none";
+            ctx.drawImage(img, 0, 0);
+
+            const scale = parseFloat(sizeSlider.value);
+            const blurStrength = parseInt(strengthSlider.value);
+            
+            sizeVal.innerText = scale + "x";
+            strengthVal.innerText = blurStrength + "px";
+
+            if (blurStrength > 0) {
+                faces.forEach(face => {
+                    const centerX = face.x + face.w / 2;
+                    const centerY = face.y + face.h / 2;
+                    const rx = (face.w / 2) * scale;
+                    const ry = (face.h / 1.4) * scale;
+
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.ellipse(centerX, centerY, rx, ry, 0, 0, Math.PI * 2);
+                    ctx.clip();
+
+                    ctx.filter = `blur(${blurStrength}px)`;
+                    ctx.drawImage(img, 0, 0);
+                    ctx.restore();
+                });
+            }
+            downloadLink.href = canvas.toDataURL();
+        }
+
+        sizeSlider.addEventListener('input', draw);
+        strengthSlider.addEventListener('input', draw);
+    </script>
+    {% else %}
+        <p>Prześlij zdjęcie, aby rozpocząć edycję.</p>
+    {% endif %}
+{% endblock %}

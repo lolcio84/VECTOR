@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}Vector Project{% endblock %}</title>
+</head>
+<body>
+
+    <header align="center">
+        <a href="{% url 'hub' %}" style="text-decoration: none; color: black;">
+            <h1>VECTOR</h1>
+        </a>
+        <hr>
+    </header>
+
+    {% block content %}
+    {% endblock %}
+
+    <br><br>
+    <hr>
+    <footer>
+        <p align="center">
+            Copyright Bolox &copy; 2026
+        </p>
+    </footer>
+
+</body>
+</html>

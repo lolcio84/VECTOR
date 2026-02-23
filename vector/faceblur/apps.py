@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class FaceBlurConfig(AppConfig):
+class FaceblurConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'face_blur'
+    name = 'faceblur'
